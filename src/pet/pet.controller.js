@@ -3,7 +3,7 @@
 import User from '../user/user.model.js';
 import Pet from './pet.model.js';
 
-// Controlador para guardar una nueva mascota
+
 export const savePet = async (req, res) => {
     try {
         const data = req.body;
@@ -36,7 +36,6 @@ export const savePet = async (req, res) => {
     }
 }
 
-// Controlador para obtener la lista de mascotas con nombres de propietarios
 export const getPets = async (req, res) => {
     const { limite = 10, desde = 0 } = req.query;
     const query = { status: true };
@@ -70,7 +69,6 @@ export const getPets = async (req, res) => {
     }
 }
 
-// Controlador para buscar una mascota por su ID
 export const searchPet = async (req, res) => {
     const { id } = req.params;
 
@@ -102,7 +100,6 @@ export const searchPet = async (req, res) => {
     }
 };
 
-// Controlador para eliminar una mascota por su ID
 export const deletePet = async (req, res) => {
     try {
         const { id } = req.params;

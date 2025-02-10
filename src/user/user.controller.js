@@ -1,4 +1,6 @@
 import { hash } from "argon2";
+import fs from 'fs';
+import path from 'path';
 import User from "./user.model.js"
 
 export const getUserById = async (req, res) => {
@@ -127,3 +129,49 @@ export const updateUser = async (req, res) => {
         });
     }
 }
+
+export const updatePhoto = async (req, res) => {
+    try {
+        const { uid } = req.params;
+        let newProfilePicture = req.file ? req.file.filename : null;
+
+        if (!newProfilePicture) {
+            return res.status(400).json({
+                success: false,
+                message: "No se proporcionó una nueva foto."
+            });
+        }
+
+        const user = await User.findById(uid);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "Usuario no encontrado."
+            });
+        }
+
+        if (user.profilePicture) {
+            const oldPhotoPath = path.join(__dirname, 'uploads', user.profilePicture);
+            fs.unlink(oldPhotoPath, (err) => {
+                if (err) {
+                    console.error('Error al eliminar la foto antigua:', err);
+                }
+            });
+        }
+
+        await User.findByIdAndUpdate(uid, { profilePicture: newProfilePicture }, { new: true });
+
+        return res.status(200).json({
+            success: true,
+            message: "Foto de perfil actualizada correctamente.",
+            user
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "Error al actualizar la foto del usuario.",
+            error: err.message
+        });
+    }
+};

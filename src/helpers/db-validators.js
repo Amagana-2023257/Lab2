@@ -1,5 +1,6 @@
 import User from "../user/user.model.js"
 import Pet from "../pet/pet.model.js"
+import Appointment from "../appointment/appointment.model.js"
 
 export const emailExists = async (email = "") => {
     const existe = await User.findOne({email})
@@ -26,6 +27,13 @@ export const petExists = async (id = "") => {
     const existe = await Pet.findById(id);
     if (!existe) {
         throw new Error("No existe la mascota con el ID proporcionado");
+    }
+};
+
+export const appointmentExists = async (id = "") => {
+    const existe = await Appointment.findById(id);
+    if (!existe) {
+        throw new Error("No existe eL Appointment con el ID proporcionado");
     }
 };
 

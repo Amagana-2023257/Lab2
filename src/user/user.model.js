@@ -1,58 +1,58 @@
 import { Schema, model} from "mongoose";
 
 const userSchema = Schema({
-    name:{
+    name: {
         type: String,
         required: [true, "Name is required"],
         maxLength: [25, "Name cannot exceed 25 characters"]
     },
-    surname:{
+    surname: {
         type: String,
         required: [true, "Surname is required"],
         maxLength: [25, "Surname cannot exceed 25 characters"]
     },
-    username:{
+    username: {
         type: String,
         required: true,
-        unique:true
+        unique: true
     },
-    email:{
+    email: {
         type: String,
         required: [true, "Email is required"],
         unique: true
     },
-    password:{
+    password: {
         type: String,
         required: [true, "Password is required"]
     },
-    profilePicture:{
-        type: String
+    profilePicture: {
+        type: String // Aquí se guardará la URL de la foto de perfil
     },
-    phone:{
+    phone: {
         type: String,
         minLength: 8,
         maxLength: 8,
         required: true
     },
-    role:{
+    role: {
         type: String,
         required: true,
         enum: ["ADMIN_ROLE", "USER_ROLE"]
     },
-    status:{
+    status: {
         type: Boolean,
         default: true
     }
 },
 {
     versionKey: false,
-    timeStamps: true
-})
+    timestamps: true // Corregido el nombre a 'timestamps' (no 'timeStamps')
+});
 
-userSchema.methods.toJSON = function(){
-    const {password, _id, ...usuario} = this.toObject()
-    usuario.uid = _id
-    return usuario
-}
+userSchema.methods.toJSON = function() {
+    const { password, _id, ...usuario } = this.toObject();
+    usuario.uid = _id;
+    return usuario;
+};
 
-export default model("User", userSchema)
+export default model("User", userSchema);
