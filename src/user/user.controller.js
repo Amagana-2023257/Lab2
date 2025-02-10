@@ -130,6 +130,8 @@ export const updateUser = async (req, res) => {
     }
 }
 
+
+
 export const updatePhoto = async (req, res) => {
     try {
         const { uid } = req.params;
