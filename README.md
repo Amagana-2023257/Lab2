@@ -1,16 +1,3 @@
-# API del Sistema de Adopción
-
-Esta API está diseñada para gestionar citas para adopciones de mascotas. Incluye funcionalidades para crear, actualizar y listar citas, así como gestionar la información del usuario.
-
-## Variables de Entorno
-
-Cree un archivo `.env` en el directorio raíz y agregue las siguientes variables:
-
-```
-MONGO_URI=<tu_cadena_de_conexión_mongodb>
-PORT=<tu_puerto_del_servidor>
-JWT_SECRET=<tu_secreto_jwt>
-```
 
 ## Endpoints de la API
 
@@ -22,12 +9,34 @@ JWT_SECRET=<tu_secreto_jwt>
   - **Cuerpo:**
     ```json
     {
-      "date": "2023-10-15T14:48:00.000Z",
+      "date": "2025-02-15T10:00:00.000Z",
       "status": "CREATED",
       "pet": "<pet_id>",
       "user": "<user_id>"
     }
     ```
+  
+- **Obtener Citas por Usuario**
+  - **URL:** `/api/appointments/user/:uid`
+  - **Método:** `GET`
+  - **URL Params:**
+    - `uid`: ID del usuario.
+  
+- **Actualizar Cita**
+  - **URL:** `/api/appointments/update/:citaId`
+  - **Método:** `PUT`
+  - **Cuerpo:**
+    ```json
+    {
+      "date": "2025-02-16T10:00:00.000Z",
+      "status": "ACCEPTED",
+      "description": "Visita para adopción"
+    }
+    ```
+  
+- **Cancelar Cita**
+  - **URL:** `/api/appointments/cancel/:citaId`
+  - **Método:** `PATCH`
 
 ### Usuarios
 
@@ -56,16 +65,20 @@ JWT_SECRET=<tu_secreto_jwt>
     ```
 
 - **Obtener Usuario por ID**
-  - **URL:** `/api/users/:uid`
+  - **URL:** `/api/users/findUser/:uid`
   - **Método:** `GET`
+  - **URL Params:**
+    - `uid`: ID del usuario.
 
 - **Eliminar Usuario**
-  - **URL:** `/api/users/:uid`
+  - **URL:** `/api/users/deleteUser/:uid`
   - **Método:** `DELETE`
+  - **URL Params:**
+    - `uid`: ID del usuario.
 
 - **Actualizar Contraseña del Usuario**
-  - **URL:** `/api/users/:uid/password`
-  - **Método:** `PUT`
+  - **URL:** `/api/users/updatePassword/:uid`
+  - **Método:** `PATCH`
   - **Cuerpo:**
     ```json
     {
@@ -73,10 +86,27 @@ JWT_SECRET=<tu_secreto_jwt>
     }
     ```
 
+- **Actualizar Información del Usuario**
+  - **URL:** `/api/users/updateUser/:uid`
+  - **Método:** `PUT`
+  - **Cuerpo:**
+    ```json
+    {
+      "name": "string",
+      "email": "string"
+    }
+    ```
+
+- **Actualizar Foto del Usuario**
+  - **URL:** `/api/users/updatePhoto/:uid`
+  - **Método:** `PATCH`
+  - **Cuerpo (multipart/form-data):**
+    - `profilePicture`: Foto de perfil.
+
 ### Mascotas
 
 - **Registrar Mascota**
-  - **URL:** `/api/pets/register`
+  - **URL:** `/api/pets/addPet`
   - **Método:** `POST`
   - **Cuerpo:**
     ```json
@@ -89,15 +119,19 @@ JWT_SECRET=<tu_secreto_jwt>
     ```
 
 - **Obtener Mascota por ID**
-  - **URL:** `/api/pets/:pid`
+  - **URL:** `/api/pets/findPet/:id`
   - **Método:** `GET`
+  - **URL Params:**
+    - `id`: ID de la mascota.
 
 - **Eliminar Mascota**
-  - **URL:** `/api/pets/:pid`
+  - **URL:** `/api/pets/deletePet/:id`
   - **Método:** `DELETE`
+  - **URL Params:**
+    - `id`: ID de la mascota.
 
 - **Actualizar Información de la Mascota**
-  - **URL:** `/api/pets/:pid`
+  - **URL:** `/api/pets/updatePet/:id`
   - **Método:** `PUT`
   - **Cuerpo:**
     ```json
@@ -109,18 +143,55 @@ JWT_SECRET=<tu_secreto_jwt>
     }
     ```
 
-## Funcionalidades Adicionales
+## Autenticación y Autorización
 
-Las siguientes funcionalidades necesitan ser desarrolladas:
+### Registro de Usuario
 
-1. **Actualizar Foto del Usuario**
-   - Descripción: Implementar funcionalidad para actualizar la foto de perfil del usuario.
+- **Método:** `POST`
+- **URL:** `/api/auth/register`
+- **Cuerpo:**
+    ```json
+    {
+      "name": "string",
+      "username": "string",
+      "email": "string",
+      "password": "string",
+      "profilePicture": "archivo_imagen"
+    }
+    ```
 
-2. **Listar Citas**
-   - Descripción: Implementar funcionalidad para listar todas las citas de un usuario.
+### Login de Usuario
 
-3. **Actualizar Cita**
-   - Descripción: Implementar funcionalidad para actualizar una cita existente.
+- **Método:** `POST`
+- **URL:** `/api/auth/login`
+- **Cuerpo:**
+    ```json
+    {
+      "email": "string",
+      "password": "string"
+    }
+    ```
 
-4. **Cancelar Cita**
-   - Descripción: Implementar funcionalidad para cancelar una cita existente.
+## Ejemplos de Respuestas
+
+### Respuesta Exitosa para la Creación de una Cita
+```json
+{
+  "success": true,
+  "msg": "Cita creada exitosamente",
+  "appointment": {
+    "_id": "67aad6cd3870a4aaaf27d8d7",
+    "date": "2025-02-15T10:00:00.000Z",
+    "status": "CREATED",
+    "pet": {
+      "_id": "67aad6685ceb0cf4849d96e5",
+      "name": "Max",
+      "type": "Dog"
+    },
+    "user": {
+      "_id": "67aad16bfb4ce9292c386c40",
+      "name": "Juan Pérez",
+      "email": "juan@example.com"
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import Pet from "../pet/pet.model.js";
 import Appointment from "../appointment/appointment.model.js";
+import mongoose from 'mongoose';
 
 export const saveAppointment = async (req, res) => {
   try {
@@ -10,6 +11,14 @@ export const saveAppointment = async (req, res) => {
       return res.status(400).json({
         success: false,
         msg: "Fecha inválida",
+      });
+    }
+
+    // Validar si el ID de la mascota es un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(data.pet)) {
+      return res.status(400).json({
+        success: false,
+        msg: "ID de mascota no válido",
       });
     }
 
@@ -56,12 +65,22 @@ export const saveAppointment = async (req, res) => {
 
 export const getAppointmentsByUserId = async (req, res) => {
   try {
-    const { uid } = req.params; 
+    const { uid } = req.params;
 
+    // Verificar si el ID es un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(uid)) {
+      return res.status(400).json({
+        success: false,
+        msg: "ID de usuario no válido",
+      });
+    }
+
+    // Buscar las citas del usuario con el `uid` proporcionado
     const appointments = await Appointment.find({ user: uid })
-      .populate("pet", "name type") 
-      .populate("user", "name email"); 
+      .populate("pet", "name type")  // Esto te da el nombre y tipo de la mascota
+      .populate("user", "name email");  // Esto te da el nombre y email del usuario
 
+    // Si no se encuentran citas, responder con un mensaje de error
     if (!appointments || appointments.length === 0) {
       return res.status(404).json({
         success: false,
@@ -69,11 +88,13 @@ export const getAppointmentsByUserId = async (req, res) => {
       });
     }
 
+    // Si se encuentran citas, devolverlas
     return res.status(200).json({
       success: true,
       appointments,
     });
   } catch (error) {
+    console.error("Error al obtener las citas: ", error);
     return res.status(500).json({
       success: false,
       msg: "Error al obtener las citas",
@@ -81,6 +102,7 @@ export const getAppointmentsByUserId = async (req, res) => {
     });
   }
 };
+
 
 export const updateAppointment = async (req, res) => {
   try {

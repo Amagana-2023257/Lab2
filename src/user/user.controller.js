@@ -1,4 +1,4 @@
-import { hash } from "argon2";
+import { hash, verify  } from "argon2";
 import fs from 'fs';
 import path from 'path';
 import User from "./user.model.js"
@@ -112,24 +112,39 @@ export const updatePassword = async (req, res) => {
 export const updateUser = async (req, res) => {
     try {
         const { uid } = req.params;
-        const  data  = req.body;
+        
+        // Verificar si el UID es un ObjectId válido
+        if (!mongoose.Types.ObjectId.isValid(uid)) {
+            return res.status(400).json({
+                success: false,
+                message: "El ID proporcionado no es válido"
+            });
+        }
+
+        const data = req.body;
 
         const user = await User.findByIdAndUpdate(uid, data, { new: true });
 
-        res.status(200).json({
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "Usuario no encontrado"
+            });
+        }
+
+        return res.status(200).json({
             success: true,
-            msg: 'Usuario Actualizado',
+            msg: 'Usuario actualizado',
             user,
         });
     } catch (err) {
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             msg: 'Error al actualizar usuario',
             error: err.message
         });
     }
-}
-
+};
 
 
 export const updatePhoto = async (req, res) => {

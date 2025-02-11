@@ -26,29 +26,31 @@ export const register = async (req, res) => {
 }
 
 export const login = async (req, res) => {
-    const { email, username, password } = req.body
-    try{
+    const { email, username, password } = req.body;
+    try {
         const user = await User.findOne({
-            $or:[{email: email}, {username: username}]
-        })
+            $or: [{ email: email }, { username: username }]
+        });
 
-        if(!user){
+        if (!user) {
             return res.status(400).json({
                 message: "Crendenciales inválidas",
-                error:"No existe el usuario o correo ingresado"
-            })
+                error: "No existe el usuario o correo ingresado"
+            });
         }
 
-        const validPassword = await verify(user.password, password)
+        const validPassword = await verify(user.password, password);
+        console.log('Password valid:', validPassword); // Verifica si la contraseña es válida
 
-        if(!validPassword){
+        if (!validPassword) {
             return res.status(400).json({
                 message: "Crendenciales inválidas",
                 error: "Contraseña incorrecta"
-            })
+            });
         }
 
-        const token = await generateJWT(user.id)
+        const token = await generateJWT(user.id);
+        console.log('JWT Token:', token); // Verifica si el token se genera correctamente
 
         return res.status(200).json({
             message: "Login successful",
@@ -56,11 +58,12 @@ export const login = async (req, res) => {
                 token: token,
                 profilePicture: user.profilePicture
             }
-        })
-    }catch(err){
+        });
+    } catch (err) {
+        console.log(err); // Imprime el error completo
         return res.status(500).json({
             message: "login failed, server error",
-            error: err.message
-        })
+            error: err.stack || err.message || err
+        });
     }
-}
+};
